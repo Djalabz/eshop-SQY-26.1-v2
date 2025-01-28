@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;    // Chiffrement TLS activé
             
                 //Destinataires
-                $mail->setFrom($email, $username);        // Infos du User à l'origine du mail
+                $mail->setFrom($email, $username);                  // Infos du User à l'origine du mail
                 $mail->addAddress($email, 'Romain Jalabert');        // Ajouter le destinataire
             
                 //Content                           
