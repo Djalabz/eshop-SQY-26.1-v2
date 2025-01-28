@@ -1,2 +1,3 @@
 vendor/
 dotenv.php
+.env
