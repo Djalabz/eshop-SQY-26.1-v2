@@ -7,42 +7,56 @@ use PHPMailer\PHPMailer\Exception;
 
 //Autoload permet de charger les classes ci-dessus
 require 'vendor/autoload.php';
+include "dotenv.php";
 
-// On crée une instance de PHPMailer 
-$mail = new PHPMailer(true);
+// Si on a bien, soumis des données en POST
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-try {
-    // Configuration serveur SMTP               
-    $mail->isSMTP();                                            // ON précise ici qu'on va utiliser le protocole SMTP = Simlpe Mail Transfer Protocol
-    $mail->Host       = 'smtp.gmail.com';                       // On précise l'hote ici gmail
-    $mail->Port       = 465;                                    // TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-    $mail->SMTPAuth   = true;                                   // Authentification pour le SMTP
-    $mail->Username   = 'user@example.com';                     // Email de destination (à ne pas mettre en clair)
-    $mail->Password   = 'secret';                               // MDP d'application gmail
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // Chiffrement TLS activé
+    if (!empty($_POST["username"]) && !empty($_POST["email"]) && !empty($_POST["subject"]) && !empty($_POST["message"])) {
 
-    //Recipients
-    $mail->setFrom('from@example.com', 'Mailer');
-    $mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
-    $mail->addAddress('ellen@example.com');               //Name is optional
-    $mail->addReplyTo('info@example.com', 'Information');
-    $mail->addCC('cc@example.com');
-    $mail->addBCC('bcc@example.com');
+        if (filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
 
-    //Attachments
-    $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
-    $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+            $userEmail = $_POST["email"];
+            $username = htmlspecialchars($_POST["username"]);
+            $subject = htmlspecialchars($_POST["subject"]);
+            $message = htmlspecialchars($_POST["message"]);
 
-    //Content
-    $mail->isHTML(true);                                  //Set email format to HTML
-    $mail->Subject = 'Here is the subject';
-    $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+            // On crée une instance de PHPMailer 
+            $mail = new PHPMailer(true);
 
-    $mail->send();
+            try {
+                // Configuration serveur SMTP               
+                $mail->isSMTP();                                    // ON précise ici qu'on va utiliser le protocole SMTP = Simlpe Mail Transfer Protocol
+                $mail->Host       = 'smtp.gmail.com';               // On précise l'hote ici gmail
+                $mail->Port       = 465;                            // TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+                $mail->SMTPAuth   = true;                           // Authentification pour le SMTP
+                $mail->Username   = $email;                         // Email de destination (à ne pas mettre en clair)
+                $mail->Password   = $appPassword;                   // MDP d'application gmail
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;    // Chiffrement TLS activé
+            
+                //Destinataires
+                $mail->setFrom($email, $username);        // Infos du User à l'origine du mail
+                $mail->addAddress($email, 'Romain Jalabert');        // Ajouter le destinataire
+            
+                //Content                           
+                $mail->Subject = $subject; // Le sujet du mail  qui provient du contact form
+                $mail->Body    = $message . "// Message de $username"; // Le corps du message qui provient aussi du contact form
+            
+                // Envoi du mail 
+                $mail->send();
 
-    echo 'Message has been sent';
+                // Redirection vers une page de succès 
+                header("Location: contact-success.php");
+            
+            } catch (Exception $e) {
+                echo "Erreur lors de l'envoi du message : {$mail->ErrorInfo}";
+            }
 
-} catch (Exception $e) {
-    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+
+    }
+
 }
+
+
+

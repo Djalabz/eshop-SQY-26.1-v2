@@ -8,7 +8,7 @@ include "partials/header.php"
 <section class="contact">
     <h1 class="text-center mt-8 mb-8">Page de contact</h1>
 
-    <form class="flex flex-col w-80 mx-auto" action="" method="POST">
+    <form class="flex flex-col w-80 mx-auto" action="contact-process.php" method="POST">
 
         <input class="w-80 border rounded mb-4 p-2" placeholder="Votre username" name="username"  type="text">
         <input class="w-80 border rounded mb-4 p-2" placeholder="Votre email" name="email"  type="email">
